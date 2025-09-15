@@ -2,7 +2,7 @@
 # Copyright (c) 2021-2025 PeterSuh-Q3
 # Author: PeterSuh-Q3
 # License: MIT
-# https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
+# https://raw.githubusercontent.com/Umio-Yasuno/amdgpu_top/refs/heads/main/LICENSE
 
 function header_info {
   clear
