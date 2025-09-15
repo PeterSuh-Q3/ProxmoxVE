@@ -115,28 +115,32 @@ install() {
   if ! source $HOME/.cargo/env 2>/dev/null; then
     export PATH="$HOME/.cargo/bin:$PATH"
   fi
-  
-  msg_info "Cloning amdgpu_top repository"
-  if [ -d "amdgpu_top" ]; then
-    rm -rf amdgpu_top
-  fi
-  $STD git clone https://github.com/Umio-Yasuno/amdgpu_top.git
-  msg_ok "Cloned amdgpu_top repository"
-  
-  cd amdgpu_top
-  
-  msg_info "Building amdgpu_top with cargo"
-  $STD cargo build --release
-  msg_ok "Built amdgpu_top"
-  
-  msg_info "Installing amdgpu_top binary to /usr/sbin"
-  cp -f ./target/release/amdgpu_top /usr/sbin/
-  chmod +x /usr/sbin/amdgpu_top
+
+  msg_info "Installing amdgpu_top with cargo"
+  $STD cargo install amdgpu_top
   msg_ok "Installed amdgpu_top binary"
   
+  #msg_info "Cloning amdgpu_top repository"
+  #if [ -d "amdgpu_top" ]; then
+  #  rm -rf amdgpu_top
+  #fi
+  #$STD git clone https://github.com/Umio-Yasuno/amdgpu_top.git
+  #msg_ok "Cloned amdgpu_top repository"
+  
+  #cd amdgpu_top
+  
+  #msg_info "Building amdgpu_top with cargo"
+  #$STD cargo build --release
+  #msg_ok "Built amdgpu_top"
+  
+  #msg_info "Installing amdgpu_top binary to /usr/sbin"
+  #cp -f ./target/release/amdgpu_top /usr/sbin/
+  #chmod +x /usr/sbin/amdgpu_top
+  #msg_ok "Installed amdgpu_top binary"
+  
   # Clean up build directory
-  cd ..
-  rm -rf amdgpu_top
+  #cd ..
+  #rm -rf amdgpu_top
   
   msg_ok "Completed Successfully!\n"
   echo -e "\n amdgpu_top has been installed and is available system-wide."
