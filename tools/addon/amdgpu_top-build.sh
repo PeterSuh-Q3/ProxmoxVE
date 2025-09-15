@@ -1,3 +1,21 @@
+#!/usr/bin/env bash
+# Copyright (c) 2021-2025 PeterSuh-Q3
+# Author: PeterSuh-Q3
+# License: MIT
+# https://raw.githubusercontent.com/Umio-Yasuno/amdgpu_top/refs/heads/main/LICENSE
+
+function header_info {
+  clear
+  cat <<"EOF"
+     _    __  __ ____   ____ ____  _   _   _____
+    / \  |  \/  |  _ \ / ___|  _ \| | | | |_   _|___  _ __
+   / _ \ | |\/| | | | | |  _| |_) | | | |   | |/ _ \| '_ \
+  / ___ \| |  | | |_| | |_| |  __/| |_| |   | | (_) | |_) |
+ /_/   \_\_|  |_|____/ \____|_|    \___/    |_|\___/| .__/
+                                                    |_|
+EOF
+}
+
 YW=$(echo "\033[33m")
 BL=$(echo "\033[36m")
 RD=$(echo "\033[01;31m")
