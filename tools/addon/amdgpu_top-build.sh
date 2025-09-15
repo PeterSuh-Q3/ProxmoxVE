@@ -133,7 +133,7 @@ install() {
   #msg_ok "Built amdgpu_top"
   
   msg_info "Installing amdgpu_top binary to /usr/sbin"
-  cp -f ./cargo/bin/amdgpu_top /usr/sbin/
+  cp -f $HOME/.cargo/bin/amdgpu_top /usr/sbin/
   msg_ok "Installed amdgpu_top binary"
   
   msg_ok "Completed Successfully!\n"
