@@ -31,6 +31,9 @@ set -e
 header_info
 echo "Loading..."
 
+# Spinner PID global variable
+SPINNER_PID=""
+
 # Print info message with spinner animation in background
 function msg_info() {
   local msg="$1"
@@ -61,7 +64,14 @@ function msg_ok() {
   echo -e "${BFR} ${CM} ${GN}$1${CL}"
 }
 
-function msg_error() { echo -e "${RD}✗ $1${CL}"; }
+function msg_error() {
+  if [[ -n "$SPINNER_PID" ]]; then
+    kill "$SPINNER_PID" 2>/dev/null
+    wait "$SPINNER_PID" 2>/dev/null
+    SPINNER_PID=""
+  fi
+  echo -e "${RD}✗ $1${CL}"
+}
 
 # This function checks if system has required packages for compilation
 check_system() {
