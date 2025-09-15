@@ -139,6 +139,17 @@ install() {
   msg_ok "Completed Successfully!\n"
   echo -e "\n amdgpu_top has been installed and is available system-wide."
   echo -e " Run ${BL}amdgpu_top${CL} to start monitoring your AMD GPU.\n"
+  echo
+  echo -e " ${GN}Usage${CL}"
+  echo -e " Run TUI mode "
+  echo -e " ${BL}amdgpu_top${CL}"
+  echo  
+  echo -e " Run GUI mode "
+  echo -e " ${RD}amdgpu_top --gui${CL}"
+  echo  
+  echo -e " Run SMI mode "
+  echo -e " ${YW}amdgpu_top --smi${CL}"
+
 }
 
 uninstall() {
