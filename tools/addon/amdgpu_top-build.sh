@@ -67,11 +67,13 @@ check_system() {
     msg_error "This script must be run as root"
     exit 1
   fi
-  
-  if [ "$PACKAGE_MANAGER" = "dnf" ] && ! command -v whiptail &> /dev/null; then
-    msg_info "Installing whiptail dependency for Fedora"
-    dnf install -y newt
-    msg_ok "Installed whiptail dependency"
+
+  if [ "$PACKAGE_MANAGER" = "dnf" ]; then
+    if ! rpm -q newt >/dev/null 2>&1; then
+      msg_info "Installing whiptail dependency for Fedora"
+      dnf install -y newt
+      msg_ok "Installed whiptail dependency"
+    fi
   fi
 }
 
