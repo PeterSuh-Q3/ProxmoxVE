@@ -31,14 +31,34 @@ set -e
 header_info
 echo "Loading..."
 
+# Print info message with spinner animation in background
 function msg_info() {
   local msg="$1"
-  echo -ne " ${HOLD} ${YW}${msg}..."
+  local spinner='-\|/'
+  local delay=0.1
+  # Print message and trailing dots
+  echo -n " ${HOLD} ${YW}${msg}..."
+
+  # Run spinner animation in background
+  (
+    while true; do
+      for ((i=0; i<${#spinner}; i++)); do
+        echo -ne "\b${spinner:i:1}"
+        sleep $delay
+      done
+    done
+  ) &
+  SPINNER_PID=$!
 }
 
+# Stop spinner animation and print OK message
 function msg_ok() {
-  local msg="$1"
-  echo -e "${BFR} ${CM} ${GN}${msg}${CL}"
+  if [[ -n "$SPINNER_PID" ]]; then
+    kill "$SPINNER_PID" 2>/dev/null
+    wait "$SPINNER_PID" 2>/dev/null
+    SPINNER_PID=""
+  fi
+  echo -e "${BFR} ${CM} ${GN}$1${CL}"
 }
 
 function msg_error() { echo -e "${RD}✗ $1${CL}"; }
