@@ -118,7 +118,6 @@ install() {
 
   msg_info "Installing amdgpu_top with cargo"
   $STD cargo install amdgpu_top
-  msg_ok "Installed amdgpu_top binary"
   
   #msg_info "Cloning amdgpu_top repository"
   #if [ -d "amdgpu_top" ]; then
@@ -133,14 +132,9 @@ install() {
   #$STD cargo build --release
   #msg_ok "Built amdgpu_top"
   
-  #msg_info "Installing amdgpu_top binary to /usr/sbin"
-  #cp -f ./target/release/amdgpu_top /usr/sbin/
-  #chmod +x /usr/sbin/amdgpu_top
-  #msg_ok "Installed amdgpu_top binary"
-  
-  # Clean up build directory
-  #cd ..
-  #rm -rf amdgpu_top
+  msg_info "Installing amdgpu_top binary to /usr/sbin"
+  cp -f ./cargo/bin/amdgpu_top /usr/sbin/
+  msg_ok "Installed amdgpu_top binary"
   
   msg_ok "Completed Successfully!\n"
   echo -e "\n amdgpu_top has been installed and is available system-wide."
@@ -190,9 +184,6 @@ uninstall() {
     $STD apt autoremove -y
     msg_ok "Removed build dependencies"
   fi
-  
-  # Clean up any leftover build directories
-  rm -rf amdgpu_top
   
   msg_ok "Completed Successfully!\n"
   echo -e "\n amdgpu_top has been successfully uninstalled from your system.\n"
