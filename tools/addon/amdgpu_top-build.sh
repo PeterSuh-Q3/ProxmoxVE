@@ -16,11 +16,12 @@ function header_info {
 EOF
 }
 
-YW=$(echo "\033[33m")
-BL=$(echo "\033[36m")
-RD=$(echo "\033[01;31m")
-GN=$(echo "\033[1;92m")
-CL=$(echo "\033[m")
+# Define ANSI escape codes properly
+YW='\033[33m'
+BL='\033[36m'
+RD='\033[01;31m'
+GN='\033[1;92m'
+CL='\033[m'
 BFR="\r\033[K"
 HOLD="-"
 CM="${GN}✓${CL}"
