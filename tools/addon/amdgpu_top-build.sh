@@ -1,21 +1,3 @@
-#!/usr/bin/env bash
-# Copyright (c) 2021-2025 PeterSuh-Q3
-# Author: PeterSuh-Q3
-# License: MIT
-# https://raw.githubusercontent.com/Umio-Yasuno/amdgpu_top/refs/heads/main/LICENSE
-
-function header_info {
-  clear
-  cat <<"EOF"
-     _    __  __ ____   ____ ____  _   _   _____
-    / \  |  \/  |  _ \ / ___|  _ \| | | | |_   _|___  _ __
-   / _ \ | |\/| | | | | |  _| |_) | | | |   | |/ _ \| '_ \
-  / ___ \| |  | | |_| | |_| |  __/| |_| |   | | (_) | |_) |
- /_/   \_\_|  |_|____/ \____|_|    \___/    |_|\___/| .__/
-                                                    |_|
-EOF
-}
-
 YW=$(echo "\033[33m")
 BL=$(echo "\033[36m")
 RD=$(echo "\033[01;31m")
@@ -24,7 +6,6 @@ CL=$(echo "\033[m")
 BFR="\r\033[K"
 HOLD="-"
 CM="${GN}✓${CL}"
-
 silent() { "$@" >/dev/null 2>&1; }
 set -e
 
@@ -34,12 +15,17 @@ set_package_manager() {
   PACKAGE_REMOVE="apt remove --purge -y"
   PACKAGE_AUTOREMOVE="apt autoremove -y"
   LIBDRM_PKG="libdrm-dev"
+  BUILD_ESSENTIAL="build-essential"
+  LIBDRM_RUNTIME="libdrm-amdgpu1"
+  
   if [ -f /etc/fedora-release ]; then
     PACKAGE_MANAGER="dnf"
     PACKAGE_INSTALL="dnf install -y"
     PACKAGE_REMOVE="dnf remove -y"
     PACKAGE_AUTOREMOVE=""
     LIBDRM_PKG="libdrm-devel"
+    BUILD_ESSENTIAL="gcc gcc-c++ make cmake"
+    LIBDRM_RUNTIME="libdrm"
   fi
 }
 
@@ -63,6 +49,12 @@ check_system() {
     msg_error "This script must be run as root"
     exit 1
   fi
+  
+  if [ "$PACKAGE_MANAGER" = "dnf" ] && ! command -v whiptail &> /dev/null; then
+    msg_info "Installing whiptail dependency for Fedora"
+    dnf install -y newt
+    msg_ok "Installed whiptail dependency"
+  fi
 }
 
 check_installed() {
@@ -76,7 +68,7 @@ check_installed() {
 install() {
   header_info
   set_package_manager
-
+  
   if check_installed; then
     while true; do
       read -p "amdgpu_top is already installed. Do you want to reinstall? (y/n)? " yn
@@ -96,17 +88,17 @@ install() {
       esac
     done
   fi
-
+  
   read -r -p "Verbose mode? <y/N> " prompt
   [[ ${prompt,,} =~ ^(y|yes)$ ]] && STD="" || STD="silent"
-
+  
   msg_info "Updating package lists and installing build dependencies"
   if [ "$PACKAGE_MANAGER" = "apt" ]; then
     $STD apt update
   fi
-  $STD $PACKAGE_INSTALL build-essential git curl $LIBDRM_PKG libdrm-amdgpu1
+  $STD $PACKAGE_INSTALL $BUILD_ESSENTIAL git curl $LIBDRM_PKG $LIBDRM_RUNTIME
   msg_ok "Updated package lists and installed build dependencies"
-
+  
   msg_info "Installing Rust via rustup official script"
   if command -v rustc &> /dev/null; then
     msg_ok "Rust is already installed, skipping installation"
@@ -120,19 +112,19 @@ install() {
     source $HOME/.cargo/env
     msg_ok "Installed Rust"
   fi
-
+  
   if ! source $HOME/.cargo/env 2>/dev/null; then
     export PATH="$HOME/.cargo/bin:$PATH"
   fi
-
+  
   msg_info "Installing amdgpu_top with cargo"
   $STD cargo install amdgpu_top
-
+  
   msg_info "Installing amdgpu_top binary to /usr/sbin"
   cp -f $HOME/.cargo/bin/amdgpu_top /usr/sbin/
   msg_ok "Installed amdgpu_top binary"
   msg_ok "Completed Successfully!\n"
-
+  
   echo -e "\n amdgpu_top has been installed and is available system-wide."
   echo -e " Run ${BL}amdgpu_top${CL} to start monitoring your AMD GPU.\n"
   echo
@@ -153,7 +145,7 @@ uninstall() {
     msg_error "amdgpu_top is not installed on this system."
     exit 1
   fi
-
+  
   while true; do
     read -p "Are you sure you want to uninstall amdgpu_top? (y/n)? " yn
     case $yn in
@@ -162,17 +154,17 @@ uninstall() {
     *) echo "Please answer yes or no." ;;
     esac
   done
-
+  
   read -r -p "Also remove Rust and build dependencies? <y/N> " prompt
   [[ ${prompt,,} =~ ^(y|yes)$ ]] && REMOVE_DEPS=true || REMOVE_DEPS=false
-
+  
   read -r -p "Verbose mode? <y/N> " prompt
   [[ ${prompt,,} =~ ^(y|yes)$ ]] && STD="" || STD="silent"
-
+  
   msg_info "Removing amdgpu_top binary"
   rm -f /usr/sbin/amdgpu_top
   msg_ok "Removed amdgpu_top binary"
-
+  
   if [ "$REMOVE_DEPS" = true ]; then
     msg_info "Removing Rust installation"
     if [ -f "$HOME/.cargo/env" ]; then
@@ -183,15 +175,15 @@ uninstall() {
     fi
     rm -rf $HOME/.cargo $HOME/.rustup
     msg_ok "Removed Rust installation"
-
+    
     msg_info "Removing build dependencies"
-    $STD $PACKAGE_REMOVE build-essential $LIBDRM_PKG libdrm-amdgpu1
+    $STD $PACKAGE_REMOVE $BUILD_ESSENTIAL $LIBDRM_PKG $LIBDRM_RUNTIME
     if [ -n "$PACKAGE_AUTOREMOVE" ]; then
       $STD $PACKAGE_AUTOREMOVE
     fi
     msg_ok "Removed build dependencies"
   fi
-
+  
   msg_ok "Completed Successfully!\n"
   echo -e "\n amdgpu_top has been successfully uninstalled from your system.\n"
 }
