@@ -1387,6 +1387,7 @@ EOF'
     if ([ "$GPU_TYPE" == "nvidia" ]); then
       msg_info "Inatalling nvidia-driver and cuda-toolkit on LXC Container"
       pct exec "$CTID" -- bash -c "apt-get install -y nvidia-driver-$var_nv_version nvidia-cuda-toolkit >/dev/null"
+      msg_ok "Inatalled nvidia-driver and cuda-toolkit on LXC Container"
     fi
   fi
   msg_ok "Customized LXC Container"
