@@ -212,7 +212,7 @@ ssh_check() {
 base_settings() {
   # Default Settings
   CT_TYPE="1"
-  GPU_TYPE="INTEL"
+  GPU_TYPE="intel(or amd)"
   DISK_SIZE="4"
   CORE_COUNT="1"
   RAM_SIZE="1024"
@@ -243,6 +243,7 @@ base_settings() {
   DISK_SIZE=${var_disk:-$DISK_SIZE}
   CORE_COUNT=${var_cpu:-$CORE_COUNT}
   RAM_SIZE=${var_ram:-$RAM_SIZE}
+  GPU_TYPE=${var_gpu:-$GPU_TYPE}
   VERB=${var_verbose:-$VERBOSE}
   TAGS="${TAGS}${var_tags:-}"
   ENABLE_FUSE="${var_fuse:-$ENABLE_FUSE}"
@@ -1438,7 +1439,6 @@ EOF
 
   post_update_to_api "done" "none"
 
-  [[ "$GPU_TYPE" == "nvidia" ]] && nvidia-smi
 }
 
 api_exit_script() {
