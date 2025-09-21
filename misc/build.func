@@ -1382,6 +1382,10 @@ EOF'
     fi
 
     pct exec "$CTID" -- bash -c "apt-get update >/dev/null && apt-get install -y sudo curl mc gnupg2 jq >/dev/null"
+    if ([ "$GPU_TYPE" == "nvidia" ]); then
+      msg_info "Inatalling nvidia-driver and cuda-toolkit on LXC Container"
+      pct exec "$CTID" -- bash -c "apt-get install -y nvidia-driver-$var_nv_version nvidia-cuda-toolkit >/dev/null"
+    fi
   fi
   msg_ok "Customized LXC Container"
 
@@ -1422,6 +1426,7 @@ description() {
   </span>
 </div>
 EOF
+  [[ "$GPU_TYPE" == "nvidia" ]] && nvidia-smi
   )
 
   # Set Description in LXC
