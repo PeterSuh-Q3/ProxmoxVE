@@ -1385,14 +1385,17 @@ EOF'
 
     pct exec "$CTID" -- bash -c "apt-get update >/dev/null && apt-get install -y sudo curl mc gnupg2 jq >/dev/null"
     if ([ "$GPU_TYPE" == "nvidia" ]); then
-      msg_info "Inatalling nvidia-driver and cuda-toolkit on LXC Container"
-      pct exec "$CTID" -- bash -c "apt-get install -y nvidia-driver-$var_nv_version nvidia-cuda-toolkit >/dev/null"
-      msg_ok "Inatalled nvidia-driver and cuda-toolkit on LXC Container"
+      msg_info "Inatalling nvidia-driver on LXC Container"
+      pct exec "$CTID" -- bash -c "apt-get install -y nvidia-driver-$var_nv_version >/dev/null"
+      msg_ok "Inatalled nvidia-driver on LXC Container"
+      msg_info "Inatalling nvidia-cuda-toolkit on LXC Container"
+      pct exec "$CTID" -- bash -c "apt-get install -y nvidia-cuda-toolkit >/dev/null"
+      msg_ok "Inatalled nvidia-cuda-toolkit on LXC Container"
     fi
   fi
   msg_ok "Customized LXC Container"
 
-  lxc-attach -n "$CTID" -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/${var_install}.sh)"
+  lxc-attach -n "$CTID" -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/PeterSuh-Q3/ProxmoxVE/main/install/${var_install}.sh)"
 }
 
 # This function sets the description of the container.
