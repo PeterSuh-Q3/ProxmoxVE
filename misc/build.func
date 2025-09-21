@@ -1426,7 +1426,6 @@ description() {
   </span>
 </div>
 EOF
-  [[ "$GPU_TYPE" == "nvidia" ]] && nvidia-smi
   )
 
   # Set Description in LXC
@@ -1437,6 +1436,8 @@ EOF
   fi
 
   post_update_to_api "done" "none"
+
+  [[ "$GPU_TYPE" == "nvidia" ]] && nvidia-smi
 }
 
 api_exit_script() {
