@@ -1213,6 +1213,8 @@ EOF
     fi
   done
 
+  [[ "$var_gpu" = "nvidia" ]] && is_vaapi_app=false
+
   if ([ "$CT_TYPE" == "0" ] || [ "$is_vaapi_app" == "true" ]) &&
     ([[ -e /dev/dri/renderD128 ]] || [[ -e /dev/dri/card0 ]] || [[ -e /dev/fb0 ]]); then
 
