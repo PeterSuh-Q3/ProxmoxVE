@@ -5,7 +5,7 @@ source <(curl -fsSL https://raw.githubusercontent.com/PeterSuh-Q3/ProxmoxVE/main
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://jellyfin.org/
 
-APP="Jellyfin-nvidia"
+APP="Jellyfin"
 var_tags="${var_tags:-media}"
 var_cpu="${var_cpu:-2}"
 var_gpu="${var_gpu:-nvidia}"
