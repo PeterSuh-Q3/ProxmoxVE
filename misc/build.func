@@ -155,6 +155,16 @@ arch_check() {
   fi
 }
 
+# This function checks whether the host's nvidia-driver is installed via nvidia-smi 
+# and exits if it is not installed.
+nvidia_check() {
+  # Check if nvidia-smi exists in PATH
+  if ! command -v nvidia-smi > /dev/null 2>&1; then
+    echo -e "${CROSS}${RD} Error: NVIDIA driver is not installed. Cannot proceed.${CL}"
+    exit 1
+  fi
+}
+
 # Function to get the current IP address based on the distribution
 get_current_ip() {
   if [ -f /etc/os-release ]; then
@@ -930,6 +940,7 @@ install_script() {
   ssh_check
   maxkeys_check
   diagnostics_check
+  [[ "$var_gpu" = "nvidia" ]] && nvidia_check
 
   if systemctl is-active -q ping-instances.service; then
     systemctl -q stop ping-instances.service
