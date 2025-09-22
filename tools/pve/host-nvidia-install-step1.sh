@@ -19,6 +19,8 @@ cat <<"EOF"
 EOF
 }
 
+APP="Nvidia"
+
 header_info
 color
 catch_errors
@@ -86,20 +88,24 @@ function pre_reboot_setup() {
   msg_ok "Initramfs updated"
 
   msg_info "Pre-reboot setup completed"
-  msg_info "Reboot is required to unload nouveau and reload kernel modules"
+  echo -e "${YW}Reboot is required to unload nouveau and reload kernel modules${CL}"
+  echo -e "${YW}Do you want to reboot now? [y/N]: ${CL}"
+  read -r REBOOT_CHOICE
   
-  read -p "Do you want to reboot now? [y/N]: " -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    msg_info "Rebooting system..."
-    reboot
-  else
-    msg_info "Please reboot manually to complete the setup"
-  fi
+  case "$REBOOT_CHOICE" in
+    [Yy]|[Yy][Ee][Ss])
+      msg_info "Rebooting system..."
+      sleep 2
+      reboot
+      ;;
+    *)
+      msg_info "Please reboot manually to complete the setup"
+      ;;
+  esac
+  
 }
 
 pre_reboot_setup
 
 msg_ok "Pre-reboot setup completed successfully!\n"
-echo -e "${CREATING}${GN}${APP} pre-setup has been successfully initialized!${CL}"
 echo -e "${INFO}${YW} Please reboot the system to continue with NVIDIA driver installation${CL}"
