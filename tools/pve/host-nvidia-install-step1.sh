@@ -25,19 +25,6 @@ header_info
 color
 catch_errors
 
-function update_script() {
-  header_info
-  if [[ ! -f /usr/bin/nvidia-smi ]]; then
-    msg_error "No ${APP} Installation Found!"
-    exit
-  fi
-  msg_info "Updating ${APP} Drivers"
-  $STD apt-get update
-  $STD apt-get -y upgrade
-  msg_ok "Updated ${APP} Drivers"
-  exit
-}
-
 function pre_reboot_setup() {
   header_info
   
