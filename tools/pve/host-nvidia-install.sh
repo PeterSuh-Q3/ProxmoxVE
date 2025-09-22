@@ -21,8 +21,8 @@ FLAG_FILE="/root/.nvidia_setup_postreboot"
 if [ ! -f "$FLAG_FILE" ]; then
   #### 1차 처리(재부팅 전) ####
   msg "[INFO][PRE-REBOOT] Running apt update and full-upgrade" "$G"
-  apt update && apt full-upgrade -y >/dev/null
-
+  apt-get update && apt-get full-upgrade -y >/dev/null
+  
   KERNEL_VERSION=$(uname -r)
   echo
   msg "[INFO][PRE-REBOOT] Holding current proxmox kernel version: $KERNEL_VERSION" "$G"
@@ -78,10 +78,10 @@ fi
 
 #### 2차 처리(재부팅 후) ####
 msg "[INFO][POST-REBOOT] After reboot, install necessary kernel headers" "$G"
-apt update && apt install -y pve-headers-$(uname -r)
+apt-get update && apt-get install -y pve-headers-$(uname -r)
 
 msg "[INFO][POST-REBOOT] Installing nvidia-driver package" "$G"
-apt install -y nvidia-driver >/dev/null
+apt-get install -y nvidia-driver >/dev/null
 
 msg "[INFO][POST-REBOOT] Checking NVIDIA driver status with nvidia-smi" "$B"
 nvidia-smi
