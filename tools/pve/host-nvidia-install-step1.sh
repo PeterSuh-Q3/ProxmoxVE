@@ -88,19 +88,19 @@ function pre_reboot_setup() {
   msg_ok "Pre-reboot setup completed"
   echo
   msg_ok "Reboot is required to unload nouveau and reload kernel modules"
-  msg_info "Do you want to reboot now? [Yy/Nn]: "
+  msg_ok "Do you want to reboot now? [Yy/Nn]: "
   readanswer
   if [ -n "$answer" ] && [ "$answer" = "Y" ] || [ "$answer" = "y" ]; then
-      msg_ok "Rebooting system..."
+      msg_warn "Rebooting system..."
       sleep 2
       reboot
   else     
-      msg_ok "Please reboot manually to complete the setup."
+      msg_warn "Please reboot manually to complete the setup."
   fi
   
 }
 
 pre_reboot_setup
 
-msg_ok "Pre-reboot setup completed successfully!"
-msg_ok "Please reboot the system to continue with NVIDIA driver installation"
+msg_warn "Pre-reboot setup completed successfully!"
+msg_warn "Please reboot the system to continue with NVIDIA driver installation"
