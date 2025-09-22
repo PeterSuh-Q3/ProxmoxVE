@@ -1,70 +1,105 @@
-#!/bin/bash
+#!/usr/bin/env bash
+source <(curl -fsSL https://raw.githubusercontent.com/PeterSuh-Q3/ProxmoxVE/main/misc/build.func)
+# Copyright (c) 2021-2025 tteck
+# Author: tteck (tteckster)
+# License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
+# Source: NVIDIA Driver Setup for Proxmox
 
-# Color Palette
-G='\033[1;32m'
-R='\033[0;31m'
-B='\033[0;34m'
-Y='\033[0;33m'
-N='\033[0m'
+function header_info {
+clear
+cat <<"EOF"
 
-# --- Helper Functions ---
+███╗   ██╗██╗   ██╗██╗██████╗ ██╗ █████╗ 
+████╗  ██║██║   ██║██║██╔══██╗██║██╔══██╗
+██╔██╗ ██║██║   ██║██║██║  ██║██║███████║
+██║╚██╗██║╚██╗ ██╔╝██║██║  ██║██║██╔══██║
+██║ ╚████║ ╚████╔╝ ██║██████╔╝██║██║  ██║
+╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═╝
 
-# Display a message with a color
-msg() {
-    local text="$1"
-    local color="$2"
-    echo -e "${color}${text}${N}"
+EOF
 }
 
-#### 1차 처리(재부팅 전) ####
+header_info
+color
+catch_errors
 
-msg "[INFO][PRE-REBOOT] Add non-free to /etc/apt/sources.list file" "$G"
-sed -i '/^deb / {/non-free/! {/non-free-firmware/! s/$/ non-free non-free-firmware/}}' /etc/apt/sources.list
-
-msg "[INFO][PRE-REBOOT] Running apt update and full-upgrade" "$G"
-apt-get update && apt-get full-upgrade -y >/dev/null
-
-KERNEL_VERSION=$(uname -r)
-echo
-msg "[INFO][PRE-REBOOT] Holding current proxmox kernel version: $KERNEL_VERSION" "$G"
-apt-mark hold proxmox-kernel-$KERNEL_VERSION-signed
-
-# /etc/modules 중복 없이 모듈명 추가
-for mod in nvidia nvidia_uvm nvidia_drm nvidia_modeset; do
-  if ! grep -qx "$mod" /etc/modules; then
-    msg "[INFO][PRE-REBOOT] Adding $mod to /etc/modules" "$G"
-    echo "$mod" >> /etc/modules
-  else
-    msg "[INFO][PRE-REBOOT] $mod already exists in /etc/modules" "$R"
+function update_script() {
+  header_info
+  if [[ ! -f /usr/bin/nvidia-smi ]]; then
+    msg_error "No ${APP} Installation Found!"
+    exit
   fi
-done
+  msg_info "Updating ${APP} Drivers"
+  $STD apt-get update
+  $STD apt-get -y upgrade
+  msg_ok "Updated ${APP} Drivers"
+  exit
+}
 
-echo
-msg "[INFO][PRE-REBOOT] Checking loaded nouveau modules" "$Y"
-NOUVEAU_COUNT=$(dmesg | grep nouveau | wc -l)
-msg "[INFO][PRE-REBOOT] dmesg | grep nouveau | wc -l = $NOUVEAU_COUNT" "$G"
+function pre_reboot_setup() {
+  header_info
+  
+  msg_info "Adding non-free repositories to sources.list"
+  $STD sed -i '/^deb / {/non-free/! {/non-free-firmware/! s/$/ non-free non-free-firmware/}}' /etc/apt/sources.list
+  msg_ok "Added non-free repositories"
+  
+  msg_info "Running apt update and full-upgrade"
+  $STD apt-get update
+  $STD apt-get full-upgrade -y
+  msg_ok "System updated successfully"
 
-echo
-if [ "$NOUVEAU_COUNT" -gt 0 ]; then
-  echo "[INFO][PRE-REBOOT] Detected nouveau module, applying blacklist"
-  if ! grep -qx "blacklist nouveau" /etc/modprobe.d/blacklist-nvidia-nouveau.conf 2>/dev/null; then
-    echo "blacklist nouveau" >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf
-    msg "[INFO][PRE-REBOOT] Added 'blacklist nouveau'" "$G"
+  KERNEL_VERSION=$(uname -r)
+  msg_info "Holding current proxmox kernel version: $KERNEL_VERSION"
+  $STD apt-mark hold proxmox-kernel-$KERNEL_VERSION-signed
+  msg_ok "Kernel version held"
+
+  # /etc/modules에 모듈 추가
+  for mod in nvidia nvidia_uvm nvidia_drm nvidia_modeset; do
+    if ! grep -qx "$mod" /etc/modules; then
+      msg_info "Adding $mod to /etc/modules"
+      echo "$mod" >> /etc/modules
+      msg_ok "Added $mod module"
+    else
+      msg_info "$mod already exists in /etc/modules"
+    fi
+  done
+
+  msg_info "Checking for nouveau modules"
+  NOUVEAU_COUNT=$(dmesg | grep nouveau | wc -l)
+  
+  if [ "$NOUVEAU_COUNT" -gt 0 ]; then
+    msg_info "Detected nouveau module, applying blacklist"
+    if ! grep -qx "blacklist nouveau" /etc/modprobe.d/blacklist-nvidia-nouveau.conf 2>/dev/null; then
+      echo "blacklist nouveau" >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf
+      msg_ok "Added 'blacklist nouveau'"
+    fi
+    if ! grep -qx "options nouveau modeset=0" /etc/modprobe.d/blacklist-nvidia-nouveau.conf 2>/dev/null; then
+      echo "options nouveau modeset=0" >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf
+      msg_ok "Added 'options nouveau modeset=0'"
+    fi
   else
-    msg "[INFO][PRE-REBOOT] 'blacklist nouveau' already exists" "$R"
+    msg_info "No nouveau module detected, skipping blacklist"
   fi
-  if ! grep -qx "options nouveau modeset=0" /etc/modprobe.d/blacklist-nvidia-nouveau.conf 2>/dev/null; then
-    echo "options nouveau modeset=0" >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf
-    msg "[INFO][PRE-REBOOT] Added 'options nouveau modeset=0'" "$G"
+
+  msg_info "Updating initramfs"
+  $STD update-initramfs -u
+  msg_ok "Initramfs updated"
+
+  msg_info "Pre-reboot setup completed"
+  msg_info "Reboot is required to unload nouveau and reload kernel modules"
+  
+  read -p "Do you want to reboot now? [y/N]: " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    msg_info "Rebooting system..."
+    reboot
   else
-    msg "[INFO][PRE-REBOOT] 'options nouveau modeset=0' already exists" "$R"
+    msg_info "Please reboot manually to complete the setup"
   fi
-else
-  msg "[INFO][PRE-REBOOT] No nouveau module detected, skipping blacklist." "$Y"
-fi
+}
 
-msg "[INFO][PRE-REBOOT] Updating initramfs" "$G"
-update-initramfs -u
+pre_reboot_setup
 
-msg "[INFO][PRE-REBOOT] Reboot is required to unload nouveau and reload kernel modules" "$Y"
-reboot
+msg_ok "Pre-reboot setup completed successfully!\n"
+echo -e "${CREATING}${GN}${APP} pre-setup has been successfully initialized!${CL}"
+echo -e "${INFO}${YW} Please reboot the system to continue with NVIDIA driver installation${CL}"
