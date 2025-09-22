@@ -20,6 +20,10 @@ FLAG_FILE="/root/.nvidia_setup_postreboot"
 
 if [ ! -f "$FLAG_FILE" ]; then
   #### 1차 처리(재부팅 전) ####
+
+  msg "[INFO][PRE-REBOOT] Add non-free to /etc/apt/sources.list file" "$G"
+  sed -i '/^deb / {/non-free/! {/non-free-firmware/! s/$/ non-free non-free-firmware/}}' /etc/apt/sources.list
+
   msg "[INFO][PRE-REBOOT] Running apt update and full-upgrade" "$G"
   apt-get update && apt-get full-upgrade -y >/dev/null
   
