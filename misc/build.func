@@ -1219,6 +1219,7 @@ EOF
 
   if ([ "$GPU_TYPE" == "nvidia" ]); then
     echo ""
+    nvidia-modprobe -u -c=0
     msg_custom "⚙️ " "\e[96m" "Configuring nvidia device passthrough for LXC container"
     [[ -e /dev/nvidia0 ]] && echo "dev0: /dev/nvidia0,gid=44,uid=0" >>"$LXC_CONFIG"
     [[ -e /dev/nvidiactl ]] && echo "dev1: /dev/nvidiactl,gid=44,uid=0" >>"$LXC_CONFIG"
