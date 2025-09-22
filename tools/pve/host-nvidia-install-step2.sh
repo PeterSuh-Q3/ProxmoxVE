@@ -36,5 +36,30 @@ $STD apt-get install -y nvidia-driver >/dev/null
 msg_ok "Installed nvidia-driver package"
 
 nvidia-modprobe -u -c=0
+
+SERVICE_NAME=myscript.service
+SERVICE_PATH="/etc/systemd/system/${SERVICE_NAME}"
+
+msg_info "Creating systemd service file at ${SERVICE_PATH}..."
+
+cat <<EOF > "${SERVICE_PATH}"
+[Unit]
+Description=Custom Startup Script
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/nvidia-modprobe -u -c=0
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+msg_ok "${SERVICE_PATH} Service file created."
+
+msg_info "Enabling ${SERVICE_NAME} to start on boot..."
+systemctl enable "${SERVICE_NAME}"
+msg_ok "Service enabled to start on boot."
+
 msg_ok "Checking NVIDIA driver status with nvidia-smi"
 nvidia-smi
