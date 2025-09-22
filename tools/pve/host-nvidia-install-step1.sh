@@ -65,8 +65,12 @@ function pre_reboot_setup() {
   done
 
   msg_info "Adding nvidia-drm modeset=1 options to sources.list"
-  echo "options nvidia-drm modeset=1" >> /etc/modprobe.d/nvidia.conf
-  msg_ok "Added nvidia-drm modeset=1 options to sources.list"
+  if ! grep -qxF "options nvidia-drm modeset=1" /etc/modprobe.d/nvidia.conf 2>/dev/null; then
+    echo "options nvidia-drm modeset=1" >> /etc/modprobe.d/nvidia.conf
+    msg_ok "Added 'options nvidia-drm modeset=1' to /etc/modprobe.d/nvidia.conf"
+  else
+    msg_warn "'options nvidia-drm modeset=1' already exists in /etc/modprobe.d/nvidia.conf"
+  fi
 
   msg_info "Checking for nouveau modules"
   NOUVEAU_COUNT=$(dmesg | grep nouveau | wc -l)
