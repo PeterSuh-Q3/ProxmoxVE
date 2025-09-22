@@ -26,11 +26,14 @@ color
 catch_errors
 
 #### 2차 처리(재부팅 후) ####
-msg "[INFO][POST-REBOOT] After reboot, install necessary kernel headers" "$G"
-apt-get update && apt-get install -y pve-headers-$(uname -r)
+msg_info "Installing necessary kernel headers"
+$STD apt-get update 
+$STD apt-get install -y pve-headers-$(uname -r)
+msg_ok "Installed kernel headers"
 
-msg "[INFO][POST-REBOOT] Installing nvidia-driver package" "$G"
-apt-get install -y nvidia-driver >/dev/null
+msg_info "Installing nvidia-driver package"
+$STD apt-get install -y nvidia-driver >/dev/null
+msg_ok "Installed nvidia-driver package"
 
-msg "[INFO][POST-REBOOT] Checking NVIDIA driver status with nvidia-smi" "$B"
+msg_ok "Checking NVIDIA driver status with nvidia-smi"
 nvidia-smi
