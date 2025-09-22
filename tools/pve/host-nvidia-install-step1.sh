@@ -25,6 +25,17 @@ header_info
 color
 catch_errors
 
+function readanswer() {
+    while true; do
+        read answ
+        case $answ in
+            [Yy]* ) answer="$answ"; break;;
+            [Nn]* ) answer="$answ"; break;;
+            * ) echo -e "${YW}Please answer yY/nN.${CL}";;
+        esac
+    done
+}       
+
 function pre_reboot_setup() {
   header_info
   
@@ -77,19 +88,15 @@ function pre_reboot_setup() {
   echo -e "${INFO}${YW}Pre-reboot setup completed${CL}"
   echo
   echo -e "${INFO}${YW}Reboot is required to unload nouveau and reload kernel modules${CL}"
-  echo -e "${INFO}${YW}Do you want to reboot now? [y/N]: ${CL}"
-  read -r REBOOT_CHOICE
-  
-  case "$REBOOT_CHOICE" in
-    [Yy]|[Yy][Ee][Ss])
-      msg_info "Rebooting system..."
+  readanswer
+  echo "${INFO}${YW}Do you want to reboot now? [Yy/Nn]: ${CL}"
+  if [ -n "$answer" ] && [ "$answer" = "Y" ] || [ "$answer" = "y" ]; then
+      echo -e "${INFO}Rebooting system..."
       sleep 2
       reboot
-      ;;
-    *)
-      msg_info "Please reboot manually to complete the setup"
-      ;;
-  esac
+  else     
+      echo -e "${INFO}Please reboot manually to complete the setup."
+  fi
   
 }
 
