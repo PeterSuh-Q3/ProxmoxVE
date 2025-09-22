@@ -87,9 +87,10 @@ function pre_reboot_setup() {
   $STD update-initramfs -u
   msg_ok "Initramfs updated"
 
-  msg_info "Pre-reboot setup completed"
-  echo -e "${YW}Reboot is required to unload nouveau and reload kernel modules${CL}"
-  echo -e "${YW}Do you want to reboot now? [y/N]: ${CL}"
+  echo -e "${INFO}${YW}Pre-reboot setup completed${CL}"
+  echo
+  echo -e "${INFO}${YW}Reboot is required to unload nouveau and reload kernel modules${CL}"
+  echo -e "${INFO}${YW}Do you want to reboot now? [y/N]: ${CL}"
   read -r REBOOT_CHOICE
   
   case "$REBOOT_CHOICE" in
@@ -107,5 +108,5 @@ function pre_reboot_setup() {
 
 pre_reboot_setup
 
-msg_ok "Pre-reboot setup completed successfully!\n"
-echo -e "${INFO}${YW} Please reboot the system to continue with NVIDIA driver installation${CL}"
+echo -e "${INFO}${YW}Pre-reboot setup completed successfully!${CL}"
+echo -e "${INFO}${YW}Please reboot the system to continue with NVIDIA driver installation${CL}"
