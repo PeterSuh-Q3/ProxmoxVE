@@ -1,20 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
+source <(curl -fsSL https://raw.githubusercontent.com/PeterSuh-Q3/ProxmoxVE/main/misc/build.func)
+# Copyright (c) 2021-2025 tteck
+# Author: tteck (tteckster)
+# License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
+# Source: NVIDIA Driver Setup for Proxmox
 
-# Color Palette
-G='\033[1;32m'
-R='\033[0;31m'
-B='\033[0;34m'
-Y='\033[0;33m'
-N='\033[0m'
+function header_info {
+clear
+cat <<"EOF"
 
-# --- Helper Functions ---
+███╗   ██╗██╗   ██╗██╗██████╗ ██╗ █████╗ 
+████╗  ██║██║   ██║██║██╔══██╗██║██╔══██╗
+██╔██╗ ██║██║   ██║██║██║  ██║██║███████║
+██║╚██╗██║╚██╗ ██╔╝██║██║  ██║██║██╔══██║
+██║ ╚████║ ╚████╔╝ ██║██████╔╝██║██║  ██║
+╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═╝
 
-# Display a message with a color
-msg() {
-    local text="$1"
-    local color="$2"
-    echo -e "${color}${text}${N}"
+EOF
 }
+
+APP="Nvidia"
+
+header_info
+color
+catch_errors
 
 #### 2차 처리(재부팅 후) ####
 msg "[INFO][POST-REBOOT] After reboot, install necessary kernel headers" "$G"
