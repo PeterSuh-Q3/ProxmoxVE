@@ -35,5 +35,6 @@ msg_info "Installing nvidia-driver package"
 $STD apt-get install -y nvidia-driver >/dev/null
 msg_ok "Installed nvidia-driver package"
 
+nvidia-modprobe -u -c=0
 msg_ok "Checking NVIDIA driver status with nvidia-smi"
 nvidia-smi
